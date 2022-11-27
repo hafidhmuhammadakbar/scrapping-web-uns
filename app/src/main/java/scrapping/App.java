@@ -14,22 +14,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class App {
-    // public String getGreeting() {
-    // return "Hello World!";
-    // }
-
-    private static void print(String msg, Object... args) {
-        System.out.println(String.format(msg, args));
-    }
-
-    private static String trim(String s, int width) {
-        if (s.length() > width)
-            return s.substring(0, width - 1) + ".";
-        else
-            return s;
-    }
-
-    // https://www.digitalocean.com/community/tutorials/java-download-file-url
+    // method untuk mendownload file
+    // String urlStr : alamat url file
+    // String file : path lokasi file hasil download disimpan
+    // diambil dari https://www.digitalocean.com/community/tutorials/java-download-file-url
     private static void downloadUsingStream(String urlStr, String file) throws IOException{
         URL url = new URL(urlStr);
         BufferedInputStream bis = new BufferedInputStream(url.openStream());
@@ -45,28 +33,23 @@ public class App {
     }
 
     public static void main(String[] args) {
-        // System.out.println(new App().getGreeting());
         try {
             Document doc = Jsoup.connect("https://uns.ac.id/id/category/uns-update").get();
-            System.out.println(doc);
             
             Elements media = doc.select("[src]");
-            // print("\nMedia: (%d)", media.size());
             for (Element src : media) {
+                // kalau tipenya img / gambar akan diunduh
                 if (src.normalName().equals("img")) {
-                    // print(" * %s: <%s> %sx%s (%s)",
-                    //         src.tagName(), src.attr("abs:src"), src.attr("width"), src.attr("height"),
-                    //         trim(src.attr("alt"), 20));
-                    System.out.println(src.attr("abs:src"));        
+                    // print url gambar
+                    System.out.println(src.attr("abs:src")); 
+                    // panggil method untuk mengunduh gambar
+                    // ganti /tmp dengan alamat folder untuk menyimpan gambar yang diunduh 
                     downloadUsingStream(src.attr("abs:src"), 
-                    "/tmp/"+src.attr("abs:src")
+                    "/tmp"+"/"+src.attr("abs:src")
                     .replace("https://", "")
                     .replace("/", "_"));
                 }
-                // else
-                //     print(" * %s: <%s>", src.tagName(), src.attr("abs:src"));
             }
-            System.out.println("");
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
