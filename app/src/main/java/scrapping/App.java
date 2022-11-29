@@ -13,7 +13,44 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class App {
+public class App extends Thread {
+    // alamat web yang akan diuduh gambarnya
+    String urlWeb;
+
+    public App(String urlWeb){ 
+        this.urlWeb = urlWeb;
+    }
+
+    public void run() {
+        String namaThread = Thread.currentThread().getName();
+		System.out.println("Nama Thread: " + namaThread);
+        int i=0; 
+
+        try {
+            Document doc = Jsoup.connect(this.urlWeb/*"https://uns.ac.id/id/category/uns-update"*/).get();
+            
+            Elements media = doc.select("[src]");
+            for (Element src : media) {
+                // kalau tipenya img gambar akan diunduh
+                if (src.normalName().equals("img")) {
+                    // print url gambar
+                    System.out.println(src.attr("abs:src")); 
+                    // panggil method untuk mengunduh gambar
+                    // ganti /tmp dengan alamat folder untuk menyimpan gambar yang diunduh 
+                    downloadUsingStream(src.attr("abs:src"), 
+                    "/tmp/"+"/"+src.attr("abs:src") //saya ganti ke direktori saya
+                    .replace("https://", "")
+                    .replace("/", "_"));
+                    i++; //Tambahan
+                    System.out.println(namaThread + ", melakukan download ke-" + i); //Tambahan
+                }
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     // method untuk mendownload file
     // String urlStr : alamat url file
     // String file : path lokasi file hasil download disimpan
@@ -33,36 +70,10 @@ public class App {
     }
 
     public static void main(String[] args) {
-        String namaThread = Thread.currentThread().getName();
-		System.out.println("Nama Thread: " + namaThread);
-        int i=0; 
+        App app1 = new App("https://uns.ac.id/id/category/uns-update/page/3");
+        App app2 = new App("https://uns.ac.id/id/category/uns-update/page/4");
 
-        //Memulai Thread 2
-        Thread App2 = new Thread(new App2());
-        App2.start();
-
-        try {
-            Document doc = Jsoup.connect("https://uns.ac.id/id/category/uns-update").get();
-            
-            Elements media = doc.select("[src]");
-            for (Element src : media) {
-                // kalau tipenya img / gambar akan diunduh
-                if (src.normalName().equals("img")) {
-                    // print url gambar
-                    System.out.println(src.attr("abs:src")); 
-                    // panggil method untuk mengunduh gambar
-                    // ganti /tmp dengan alamat folder untuk menyimpan gambar yang diunduh 
-                    downloadUsingStream(src.attr("abs:src"), 
-                    "/home/adztrz/Scrapp/"+"/"+src.attr("abs:src") //saya ganti ke direktori saya
-                    .replace("https://", "")
-                    .replace("/", "_"));
-                    i++; //Tambahan
-                    System.out.println(namaThread + ", melakukan download ke-" + i); //Tambahan
-                }
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        app1.start();
+        app2.start();
     }
 }
