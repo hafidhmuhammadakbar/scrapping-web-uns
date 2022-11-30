@@ -34,13 +34,29 @@ public class App extends Thread {
                 // kalau tipenya img gambar akan diunduh
                 if (src.normalName().equals("img")) {
                     // print url gambar
-                    System.out.println(src.attr("abs:src")); 
+                    System.out.println(src.attr("abs:src"));
+                    
                     // panggil method untuk mengunduh gambar
                     // ganti /tmp dengan alamat folder untuk menyimpan gambar yang diunduh 
-                    downloadUsingStream(src.attr("abs:src"), 
-                    "/tmp/"+"/"+src.attr("abs:src") //saya ganti ke direktori saya
-                    .replace("https://", "")
-                    .replace("/", "_"));
+                    
+                    // string isi dengan nama dari file
+                    String namaFile = src.attr("abs:src").replace("https://", "").replace("/", "_");
+                    String namaFileFix = namaFile;
+                    // lakukan pengecekan karena saat nama file tidak berakhir dengan .png .jpg .jpeg maka akan 
+                    //      error exception
+                    for (int a = 0; a < namaFile.length(); a++) {
+                        char ch = namaFile.charAt(a);
+                        if(ch == '?'){
+                            // hapus karakter setelah tanda '?'
+                            namaFileFix = namaFile.substring(0, namaFile.indexOf("?"));
+                        }
+                    }
+
+                    // otomatis mengatur direktori user saat ini
+                    String namaDirektori = System.getProperty("user.dir").replace("//", "//");
+
+                    downloadUsingStream(src.attr("abs:src"),namaDirektori+"\\"+namaFileFix);
+                    
                     i++; //Tambahan
                     System.out.println(namaThread + ", melakukan download ke-" + i); //Tambahan
                 }
